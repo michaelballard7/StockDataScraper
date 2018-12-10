@@ -24,9 +24,12 @@ for i in range(0,len(universe)):
     html = req.text.strip()
     soup = BeautifulSoup(html,'lxml')
     table = soup.findAll("table", class_="abut_bottom")
-
-    ticker = universe['Symbol'][i]
-    last_price = soup.find(class_="last_price")
+    try:    
+        ticker = universe['Symbol'][i]
+        last_price = soup.find(class_="last_price")
+    except:
+        print("no value")
+        continue
     price = {ticker:last_price.text}
     prices = prices.copy()
     prices.update(price)
