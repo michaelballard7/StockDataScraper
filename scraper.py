@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 chdir("/Users/MichaelBallard/Desktop/stockScraper/data")
 
-universe = pd.read_csv("../data/assetUniverse.csv", index_col=None)
+universe = pd.read_csv("../data/assetUniverseDirty.csv", index_col=None)
 
 universe = universe.drop(universe.columns[universe.columns.str.contains('unnamed',case = False)],axis = 1)
 
@@ -20,7 +20,7 @@ for i in range(0,len(universe)):
     market_caps.append(0)
     last_prices.append(0)
 
-for i in range(0,3):
+for i in range(0,5):
     headers = {'User-Agent': 'Mozilla/<version> (<system-information>) <platform> (<platform-details>) <extensions>'}
     url = 'https://www.zacks.com/stock/quote/{}'.format(universe['Symbol'][i])
     req = requests.get(url, headers=headers)
@@ -48,7 +48,7 @@ for i in range(0,3):
 
 universe['Last Price'] = last_prices
 universe['Market Cap'] = market_caps
-print(universe.head(3))
+universe.to_csv("assetUniverseClean.csv")
 
     
 
