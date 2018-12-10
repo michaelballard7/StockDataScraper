@@ -12,11 +12,14 @@ universe = universe.drop(universe.columns[universe.columns.str.contains('unnamed
 
 raw_table  = tabulate(universe,headers='keys', tablefmt='psql')
 
+prices_by_ticker = {}
 market_caps = []
-prices = {}
+last_prices = []
 
 for i in range(0,len(universe)):
     market_caps.append(0)
+    last_prices.append(0)
+
 for i in range(0,3):
     headers = {'User-Agent': 'Mozilla/<version> (<system-information>) <platform> (<platform-details>) <extensions>'}
     url = 'https://www.zacks.com/stock/quote/{}'.format(universe['Symbol'][i])
@@ -27,14 +30,13 @@ for i in range(0,3):
     try:    
         ticker = universe['Symbol'][i]
         last_price = soup.find(class_="last_price")
+        last_prices[i] = last_price.text
         price = {ticker:last_price.text}
     except:
-        # bug here, attached a null to empty ticker data, leave values consistent
-        print("no value")
-        continue
-    prices = prices.copy()
-    prices.update(price)
-    # print("Last Prices",prices)
+        price = {ticker:0}
+        last_prices[i] = 0
+    prices_by_ticker = prices_by_ticker.copy()
+    prices_by_ticker.update(price)
 
     for tr in table:
         for td in tr.find_all("td"):
@@ -43,8 +45,9 @@ for i in range(0,3):
                     market_caps[i]=td.find_next_sibling("td").text 
                 except: 
                     market_caps[i] = None 
-    universe['Market Cap'] = market_caps
 
+universe['Last Price'] = last_prices
+universe['Market Cap'] = market_caps
 print(universe.head(3))
 
     
